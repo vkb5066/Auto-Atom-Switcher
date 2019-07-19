@@ -1,0 +1,18 @@
+Lower Bound C-H to Si-H,Upper Bound C-H to Si-H,Lower Bound Si-H to C-H,Upper Bound Si-H to C-H,Max number of attempts per file
+0,14,0,14,50
+Name,Defected? (0 = n),Number of attempts to make,Num C-H to Si-H,Num Si-H to C-H
+/storage/work/vkb5066/scriptTests/tst18/POSCARnew0,1,51,3,4
+/storage/work/vkb5066/scriptTests/tst18/POSCARnew1,0,24,10,6
+/storage/work/vkb5066/scriptTests/tst18/POSCARnew2,1,51,0,14
+/storage/work/vkb5066/scriptTests/tst18/POSCARnew3,1,51,12,14
+/storage/work/vkb5066/scriptTests/tst18/POSCARnew4,1,51,1,7
+/storage/work/vkb5066/scriptTests/tst18/POSCARnew5,1,51,13,11
+/storage/work/vkb5066/scriptTests/tst18/POSCARnew6,1,51,7,11
+/storage/work/vkb5066/scriptTests/tst18/POSCARnew7,1,51,8,8
+/storage/work/vkb5066/scriptTests/tst18/POSCARnew8,1,51,4,10
+/storage/work/vkb5066/scriptTests/tst18/POSCARnew9,0,2,7,1
+/storage/work/vkb5066/scriptTests/tst18/POSCARnew10,1,51,7,10
+/storage/work/vkb5066/scriptTests/tst18/POSCARnew11,1,51,13,10
+/storage/work/vkb5066/scriptTests/tst18/POSCARnew12,1,51,11,12
+/storage/work/vkb5066/scriptTests/tst18/POSCARnew13,1,51,5,10
+/storage/work/vkb5066/scriptTests/tst18/POSCARnew14,1,51,12,4
