@@ -17,7 +17,7 @@ std::string outputDataLoc = ((PATH_TO_FILES + "AutoAtomSwitcherInfo.csv").c_str(
 int nAttempts = 50; ///number of attempts to retry making a defected POSCAR before code gives up and moves to the next one
 
 
-//STRUCTS, FUNCTION DECL, ETC
+//STRUCTS, FUNCTION DECL, ETC---------------------------------------------------------------------------------------------------
 struct bondSwitchAssist
 {
 	int code;
@@ -129,10 +129,10 @@ struct idsAndCounts
 
 int main()
 {
-srand(time(NULL)); ///seed RNG
+	srand(time(NULL)); ///seed RNG
 
-	//READ IN AND CHECK INFILE POSCAR
-		//-------------------------------------------------------------------------------------------------------------------------------
+	//READ IN AND CHECK INFILE POSCAR-----------------------------------------------------------------------------------------------
+			//-------------------------------------------------------------------------------------------------------------------------------
 	Poscar P("readAll", infileLoc.c_str());
 	Poscar copyFormat = P;
 	P.fetchAtomBonds(bondInfoLoc.c_str());
@@ -211,8 +211,8 @@ srand(time(NULL)); ///seed RNG
 
 	//---------------------------------------------------------------------------------------------------------------------------------
 
-	//OUTPUT INFO ABOUT INFILE, GRAB USER INPUT
-		//Bond information
+	//OUTPUT INFO ABOUT INFILE, GRAB USER INPUT-------------------------------------------------------------------------------------
+			//Bond information
 	std::vector <bondSwitchAssist> bondSwitch;
 	std::cout << "Input file information:\n";
 	for (int i = 0; i < P.atomBonds.size(); i++)
@@ -263,23 +263,23 @@ srand(time(NULL)); ///seed RNG
 		hiB = tmp;
 	}
 
-	//Generates outfile, write header
-			std::ofstream codeData(outputDataLoc.c_str());
+	//Generates outfile, write header-----------------------------------------------------------------------------------------------
+				std::ofstream codeData(outputDataLoc.c_str());
 	codeData << "Lower Bound C-H to Si-H,Upper Bound C-H to Si-H,Lower Bound Si-H to C-H,Upper Bound Si-H to C-H,Max number of attempts per file\n"
 		<< loA << "," << hiA << "," << loB << "," << hiB << "," << nAttempts << "\n";
 	codeData << "Name,Defected? (0 = n),Number of attempts to make,Num C-H to Si-H,Num Si-H to C-H\n";
 
-	//MAIN LOOP:  ONE ITERATION FOR EACH SUCESSFUL POSCAR FILE GENERATED
+	//MAIN LOOP:  ONE ITERATION FOR EACH SUCESSFUL POSCAR FILE GENERATED------------------------------------------------------------
 	for (int mainLoopNum = 0; mainLoopNum < nModels; mainLoopNum++)
 	{
-		std::cout << ".";
-		//Get the number of switches to make for each type for a certian output
+		//Get the number of switches to make for each type for a certian output----------------------------------------------------
 		int aSwitches = (rand() % (hiA - loA + 1)) + loA; ///CH to SiH
 		int bSwitches = (rand() % (hiB - loB + 1)) + loB; ///SiH to CH
 
 		int thisAttemptNum;
 		bool defected = false;
-		//Defect loop: Continues to loop until a non-defect POSCAR is made, or the number of allowed attempts runs out 
+
+		//Defect loop: Continues to loop until a non-defect POSCAR is made, or the number of allowed attempts runs out ------------
 		for (thisAttemptNum = 0;; thisAttemptNum++)
 		{
 			//Exit conditions
@@ -289,13 +289,16 @@ srand(time(NULL)); ///seed RNG
 				break;
 			}
 
-			//Create new instance of POSCAR initially copying the input file
+			//Defect info initialization
+			std::vector <std::vector <Coords> > defInfoVect;
+
+			//Create new instance of POSCAR initially copying the input file---------------------------------------------------------
 			Poscar R = P;
-			//Switch loop: two iterations, one for each type of switch to be made
+			//Switch loop: two iterations, one for each type of switch to be made-----------------------------------------------------
 			for (int switchType = 0; switchType < 2; switchType++)
 			{
-				//Choosing what kind of type to switch: 0 corresponds to type A, 1 to type B.  Choosing num to switch
-												if (switchType == 0)
+				//Choosing what kind of type to switch: 0 corresponds to type A, 1 to type B.  Choosing num to switch------------------
+				if (switchType == 0)
 					choice = 'a';
 				if (switchType == 1)
 					choice = 'b';
@@ -318,24 +321,24 @@ srand(time(NULL)); ///seed RNG
 					tmpType2_ = "HC";
 					numToSwitch = bSwitches;
 				}
-				//Seperating the types into two seperate strings to ID atoms by
-											std::string type1 = "", type2 = "";
-							bool one = true;
-							std::string  _tmpType1_ = (tmpType1_ + "!").c_str();
-							for (int i = 0; i < _tmpType1_.size(); i++)
-							{
-								if (one)
-									type1 = (type1 + _tmpType1_[i]).c_str();
-								else
-									type2 = (type2 + _tmpType1_[i]).c_str();
+				//Seperating the types into two seperate strings to ID atoms by----------------------------------------------------------
+								std::string type1 = "", type2 = "";
+				bool one = true;
+				std::string  _tmpType1_ = (tmpType1_ + "!").c_str();
+				for (int i = 0; i < _tmpType1_.size(); i++)
+				{
+					if (one)
+						type1 = (type1 + _tmpType1_[i]).c_str();
+					else
+						type2 = (type2 + _tmpType1_[i]).c_str();
 
-								if (isupper(_tmpType1_[i + 1]))
-									one = false;
-								if (_tmpType1_[i + 1] == '!')
-									break;
-							}
-				//Mark atoms that have already been switched in a pervious loop, so as to not switch them again.  Initialize list of atoms that are OK to switch
-								std::vector <notOkIDs> notOk;
+					if (isupper(_tmpType1_[i + 1]))
+						one = false;
+					if (_tmpType1_[i + 1] == '!')
+						break;
+				}
+				//Mark atoms that have already been switched in a pervious loop, so as to not switch them again.  Initialize list of atoms that are OK to switch---------------------
+				std::vector <notOkIDs> notOk;
 				///Cases where an atom has already been counted
 				for (int i = 0; i < R.atomCoords.size(); i++)
 					if (R.atomCoords[i].extraVal == true) ///if an atom has been copied
@@ -348,7 +351,7 @@ srand(time(NULL)); ///seed RNG
 							if (R.atomBonds[i].pairedAtoms[n].id == notOk[j].id_)
 								R.atomBonds[i].pairedAtoms[n].extraInfo = "no";
 				}
-				//Mark atoms to switch, put them in vector of switches to make
+				//Mark atoms to switch, put them in vector of switches to make---------------------------------------------------------
 								std::vector <idToSwitch> switches;
 				for (int i = 0; i < R.atomBonds.size(); i++)
 					if (R.atomBonds[i].type == tmpType1 || R.atomBonds[i].type == tmpType2)
@@ -366,7 +369,7 @@ srand(time(NULL)); ///seed RNG
 					}
 				if (switches.size() == 0)
 					break;
-				//Get rid of duplicate switches / initialize counts
+				//Get rid of duplicate switches / initialize counts----------------------------------------------------------------------
 								std::vector <idToSwitch> tmp;
 				for (int i = 0; i < switches.size(); i++)
 				{
@@ -380,7 +383,7 @@ srand(time(NULL)); ///seed RNG
 						tmp.push_back(switches[i]);
 				}
 				switches = tmp;
-				//Make switches for this switch type
+				//Make switches for this switch type--------------------------------------------------------------------------------------
 								std::random_shuffle(switches.begin(), switches.end());
 				std::random_shuffle(R.atomCoords.begin(), R.atomCoords.end());
 				for (int i = 0, breakCond = 0; i < R.atomCoords.size() && breakCond < numToSwitch; i++)
@@ -393,12 +396,12 @@ srand(time(NULL)); ///seed RNG
 							breakCond += switches[j].count_; ///so switching a single atom with n bonds counts as switching n bonds, instead of just one
 						}
 					}
-				//Update Poscar
+				//Update Poscar-----------------------------------------------------------------------------------------------------------
 								R.removeDuplicates();
 				R.updateAll();
 			}
 
-			//Move hydrogen atoms closer or further away from switched atoms
+			//Move hydrogen atoms closer or further away from switched atoms---------------------------------------------------------------
 						R.convertToCartesian();
 
 			//Fill bond info vector
@@ -472,11 +475,11 @@ srand(time(NULL)); ///seed RNG
 
 						}
 			}
-			//Copy format, write new file (which possibly has defects)
+			//Copy format, write new file (which possibly has defects)---------------------------------------------------------------------------
 						R.copyFormatting(copyFormat);
 			R.write((writeLoc + std::to_string(mainLoopNum)).c_str());
-			//Check to make sure newly created Poscar has no defects.  If ok, break from defect loop. Otherwise reset the defect loop
-						bool err = false;
+			//Check to make sure newly created Poscar has no defects.  If ok, break from defect loop. Otherwise reset the defect loop---------
+			bool err = false;
 			{
 				npaPoscar W("readAll", (writeLoc + std::to_string(mainLoopNum)).c_str());
 				W.fetchAtomBonds(bondInfoLoc.c_str());
@@ -486,21 +489,61 @@ srand(time(NULL)); ///seed RNG
 				{
 					if (W.thisSpeciesVect[i].mainAtom.atomType == "H")
 						if (W.thisSpeciesVect[i].atomBonds_.size() != 1)	
+						{
 							err = true;
+							std::vector <Coords> defInfo;
+							defInfo.push_back(W.thisSpeciesVect[i].mainAtom);
+							for (int j = 0; j < W.thisSpeciesVect[i].atomBonds_.size(); j++)
+								defInfo.push_back(W.thisSpeciesVect[i].atomBonds_[j].pairedAtoms[1]); ///paired atoms [1] is always not the central atom
+							defInfoVect.push_back(defInfo);
+						}
 					if (W.thisSpeciesVect[i].mainAtom.atomType != "H")
 						if (W.thisSpeciesVect[i].atomBonds_.size() != 4)
+						{
 							err = true;
+							std::vector <Coords> defInfo;
+							defInfo.push_back(W.thisSpeciesVect[i].mainAtom);
+							for (int j = 0; j < W.thisSpeciesVect[i].atomBonds_.size(); j++)
+								defInfo.push_back(W.thisSpeciesVect[i].atomBonds_[j].pairedAtoms[1]); ///paired atoms [1] is always not the central atom
+							defInfoVect.push_back(defInfo);
+						}
 				}
 			}
 			if (!err)
+			{
+				std::ofstream defectOut_;
+				defectOut_.open(("POSCAR" + std::to_string(mainLoopNum) + "defectInfo").c_str(), std::ios_base::app);
+				defectOut_ << "Completed\n";
 				break;
+			}
+			//append defect info to this poscars defect text file
+						else
+			{
+				std::ofstream defectOut;
+				defectOut.open(("POSCAR" + std::to_string(mainLoopNum) + "defectInfo").c_str(), std::ios_base::app);
+				defectOut << "\nAttempt ( " << thisAttemptNum + 1 << " ): [Total Defects: " << defInfoVect.size() << "]----------------------\n";
+				for (int i = 0; i < defInfoVect.size(); i++)
+				{
+					defectOut << "Main Atom: " << defInfoVect[i][0].atomType << defInfoVect[i][0].id << "\n";
+					defectOut << "Coords: < " << defInfoVect[i][0].a << " , " << defInfoVect[i][0].b << " , " << defInfoVect[i][0].c << " >\n";
+					for (int j = 1; j < defInfoVect[i].size(); j++)
+					{
+						defectOut << "\tBonded Atom ( " << j << " ): " << defInfoVect[i][j].atomType << defInfoVect[i][j].id << " || Dist from Central: " << dist_(defInfoVect[i][0], defInfoVect[i][j]) << "\n";
+						defectOut << "\t-Coords: < " << defInfoVect[i][j].a << " , " << defInfoVect[i][j].b << " , " << defInfoVect[i][j].c << " >\n";
+					}
+				}
+			}
 		}
 
-		//Write generation information to csv
+		std::cout << "File " << mainLoopNum;
+		if (!defected)
+			std::cout << " completed successfully\n";
+		else
+			std::cout << " could not be written without defects in the given number of attempts\n";
+		//Write generation information to csv----------------------------------------------------------------------------------------------
 		codeData << (writeLoc + std::to_string(mainLoopNum)).c_str() << "," << defected << "," << thisAttemptNum + 1 << "," << aSwitches << "," << bSwitches << "\n";
 	}
 
 	codeData.close();
-	std::cout << "Done\n";
 	return 0;
 }

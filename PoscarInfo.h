@@ -12,7 +12,7 @@
 
 //Globals:  stuff to change paramaters as needed
 extern double GENERAL_BOND_DISTANCE = 3.5; ///(angstroms) distance between any two atoms for them to be considered bonded (works well for POSCARS with only a few atom types)
-extern std::string PATH_TO_FILES = "/storage/work/vkb5066/scriptTests/tst18/";
+extern std::string PATH_TO_FILES = "/storage/work/vkb5066/scriptTests/tst19/";
 extern std::string DEFAULT_POSCAR_OPEN_PATH = (PATH_TO_FILES + "POSCAR").c_str();
 extern std::string DEFAULT_BONDINFO_OPEN_PATH = (PATH_TO_FILES + "bondDataInfo").c_str();
 

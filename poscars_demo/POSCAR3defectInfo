@@ -1,0 +1,35 @@
+
+Attempt ( 1 ): [Total Defects: 4]----------------------
+Main Atom: C62
+Coords: < 2.90214 , 6.5477 , 4.95287 >
+	Bonded Atom ( 1 ): Si157 || Dist from Central: 1.84827
+	-Coords: < 1.8335 , 5.4134 , 5.94661 >
+	Bonded Atom ( 2 ): Si118 || Dist from Central: 1.78264
+	-Coords: < 3.8176 , 5.48411 , 3.85355 >
+	Bonded Atom ( 3 ): Si116 || Dist from Central: 1.84174
+	-Coords: < 1.8458 , 7.63296 , 3.90484 >
+Main Atom: C66
+Coords: < 2.90377 , 4.33617 , 7.01532 >
+	Bonded Atom ( 1 ): Si157 || Dist from Central: 1.85689
+	-Coords: < 1.8335 , 5.4134 , 5.94661 >
+	Bonded Atom ( 2 ): Si138 || Dist from Central: 1.86712
+	-Coords: < 1.80352 , 3.16842 , 7.97028 >
+	Bonded Atom ( 3 ): Si136 || Dist from Central: 1.78825
+	-Coords: < 3.83008 , 3.29734 , 5.89255 >
+Main Atom: C97
+Coords: < 4.12245 , 7.74984 , 6.09196 >
+	Bonded Atom ( 1 ): C76 || Dist from Central: 1.8106
+	-Coords: < 5.11159 , 8.99207 , 5.22206 >
+	Bonded Atom ( 2 ): C68 || Dist from Central: 1.77678
+	-Coords: < 3.17043 , 8.66163 , 7.28327 >
+	Bonded Atom ( 3 ): H219 || Dist from Central: 1.24
+	-Coords: < 5.08544 , 7.12483 , 6.56059 >
+Main Atom: C98
+Coords: < 4.09643 , 5.32621 , 8.37849 >
+	Bonded Atom ( 1 ): C75 || Dist from Central: 1.80922
+	-Coords: < 5.10845 , 4.21544 , 9.38611 >
+	Bonded Atom ( 2 ): C63 || Dist from Central: 1.77078
+	-Coords: < 3.10061 , 6.39517 , 9.37914 >
+	Bonded Atom ( 3 ): H220 || Dist from Central: 1.24
+	-Coords: < 5.0336 , 6.04948 , 8.00945 >
+Completed
