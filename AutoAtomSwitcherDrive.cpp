@@ -127,12 +127,37 @@ struct idsAndCounts
 	}
 };
 
-int main()
+int main(int argc, char *argv[])
 {
 	srand(time(NULL)); ///seed RNG
 
+	//check arguments for options
+	/// (in order) spit out info to screen, ignore any bad bond distances except for hydrogen bonds, print out log of defected attempts  
+	bool verbose = false, lenientErrorCheck = false, log = false, csv = false; 
+	for (int i = 1; i < argc; i++)
+	{
+		std::string arg (argv[i]);
+		if (arg == "verbose" || arg == "Verbose" || arg == "v" || arg == "V")
+			verbose = true;
+		if (arg == "lenient" || arg == "Lenient" || arg == "len" || arg == "Len")
+			lenientErrorCheck = true;
+		if (arg == "log" || arg == "Log")
+			log = true;
+		if (arg == "csv" || arg == "Csv" || arg == "CSV" || arg == "c" || arg == "C")
+			csv = true;
+	}
+
+	{
+	std::string verb = "verb";
+	if (verbose)
+	{
+		std::ofstream vCheck(verb.c_str());
+		vCheck << "flag";
+	}
+	}
+
 	//READ IN AND CHECK INFILE POSCAR-----------------------------------------------------------------------------------------------
-			//-------------------------------------------------------------------------------------------------------------------------------
+	//-------------------------------------------------------------------------------------------------------------------------------
 	Poscar P("readAll", infileLoc.c_str());
 	Poscar copyFormat = P;
 	P.fetchAtomBonds(bondInfoLoc.c_str());
@@ -156,6 +181,7 @@ int main()
 	}
 	//Checks for non-physical species
 	{
+
 		std::cout << "Input file: ";
 		bool err = false;
 
@@ -264,10 +290,13 @@ int main()
 	}
 
 	//Generates outfile, write header-----------------------------------------------------------------------------------------------
-				std::ofstream codeData(outputDataLoc.c_str());
-	codeData << "Lower Bound C-H to Si-H,Upper Bound C-H to Si-H,Lower Bound Si-H to C-H,Upper Bound Si-H to C-H,Max number of attempts per file\n"
-		<< loA << "," << hiA << "," << loB << "," << hiB << "," << nAttempts << "\n";
-	codeData << "Name,Defected? (0 = n),Number of attempts to make,Num C-H to Si-H,Num Si-H to C-H\n";
+	std::ofstream codeData(outputDataLoc.c_str());
+	if (csv)
+	{
+		codeData << "Lower Bound C-H to Si-H,Upper Bound C-H to Si-H,Lower Bound Si-H to C-H,Upper Bound Si-H to C-H,Max number of attempts per file\n"
+			<< loA << "," << hiA << "," << loB << "," << hiB << "," << nAttempts << "\n";
+		codeData << "Name,Defected? (0 = n),Number of attempts to make,Num C-H to Si-H,Num Si-H to C-H\n";
+	}
 
 	//MAIN LOOP:  ONE ITERATION FOR EACH SUCESSFUL POSCAR FILE GENERATED------------------------------------------------------------
 	for (int mainLoopNum = 0; mainLoopNum < nModels; mainLoopNum++)
@@ -497,53 +526,65 @@ int main()
 								defInfo.push_back(W.thisSpeciesVect[i].atomBonds_[j].pairedAtoms[1]); ///paired atoms [1] is always not the central atom
 							defInfoVect.push_back(defInfo);
 						}
-					if (W.thisSpeciesVect[i].mainAtom.atomType != "H")
-						if (W.thisSpeciesVect[i].atomBonds_.size() != 4)
-						{
-							err = true;
-							std::vector <Coords> defInfo;
-							defInfo.push_back(W.thisSpeciesVect[i].mainAtom);
-							for (int j = 0; j < W.thisSpeciesVect[i].atomBonds_.size(); j++)
-								defInfo.push_back(W.thisSpeciesVect[i].atomBonds_[j].pairedAtoms[1]); ///paired atoms [1] is always not the central atom
-							defInfoVect.push_back(defInfo);
-						}
+					if (!lenientErrorCheck)
+						if (W.thisSpeciesVect[i].mainAtom.atomType != "H")
+							if (W.thisSpeciesVect[i].atomBonds_.size() != 4)
+							{
+								err = true;
+								std::vector <Coords> defInfo;
+								defInfo.push_back(W.thisSpeciesVect[i].mainAtom);
+								for (int j = 0; j < W.thisSpeciesVect[i].atomBonds_.size(); j++)
+									defInfo.push_back(W.thisSpeciesVect[i].atomBonds_[j].pairedAtoms[1]); ///paired atoms [1] is always not the central atom
+								defInfoVect.push_back(defInfo);
+							}
 				}
 			}
 			if (!err)
 			{
-				std::ofstream defectOut_;
-				defectOut_.open(("POSCAR" + std::to_string(mainLoopNum) + "defectInfo").c_str(), std::ios_base::app);
-				defectOut_ << "Completed\n";
+				if (log)
+				{
+					std::ofstream defectOut_;
+					defectOut_.open(("POSCAR" + std::to_string(mainLoopNum) + "defectInfo").c_str(), std::ios_base::app);
+					defectOut_ << "Completed\n";
+				}
 				break;
 			}
 			//append defect info to this poscars defect text file
-						else
+			else
 			{
-				std::ofstream defectOut;
-				defectOut.open(("POSCAR" + std::to_string(mainLoopNum) + "defectInfo").c_str(), std::ios_base::app);
-				defectOut << "\nAttempt ( " << thisAttemptNum + 1 << " ): [Total Defects: " << defInfoVect.size() << "]----------------------\n";
-				for (int i = 0; i < defInfoVect.size(); i++)
+				if (log)
 				{
-					defectOut << "Main Atom: " << defInfoVect[i][0].atomType << defInfoVect[i][0].id << "\n";
-					defectOut << "Coords: < " << defInfoVect[i][0].a << " , " << defInfoVect[i][0].b << " , " << defInfoVect[i][0].c << " >\n";
-					for (int j = 1; j < defInfoVect[i].size(); j++)
+					std::ofstream defectOut;
+					defectOut.open(("POSCAR" + std::to_string(mainLoopNum) + "defectInfo").c_str(), std::ios_base::app);
+					defectOut << "\nAttempt ( " << thisAttemptNum + 1 << " ): [Total Defects: " << defInfoVect.size() << "]----------------------\n";
+					for (int i = 0; i < defInfoVect.size(); i++)
 					{
-						defectOut << "\tBonded Atom ( " << j << " ): " << defInfoVect[i][j].atomType << defInfoVect[i][j].id << " || Dist from Central: " << dist_(defInfoVect[i][0], defInfoVect[i][j]) << "\n";
-						defectOut << "\t-Coords: < " << defInfoVect[i][j].a << " , " << defInfoVect[i][j].b << " , " << defInfoVect[i][j].c << " >\n";
+						defectOut << "Main Atom: " << defInfoVect[i][0].atomType << defInfoVect[i][0].id << "\n";
+						defectOut << "Coords: < " << defInfoVect[i][0].a << " , " << defInfoVect[i][0].b << " , " << defInfoVect[i][0].c << " >\n";
+						for (int j = 1; j < defInfoVect[i].size(); j++)
+						{
+							defectOut << "\tBonded Atom ( " << j << " ): " << defInfoVect[i][j].atomType << defInfoVect[i][j].id << " || Dist from Central: " << dist_(defInfoVect[i][0], defInfoVect[i][j]) << "\n";
+							defectOut << "\t-Coords: < " << defInfoVect[i][j].a << " , " << defInfoVect[i][j].b << " , " << defInfoVect[i][j].c << " >\n";
+						}
 					}
 				}
 			}
 		}
 
-		std::cout << "File " << mainLoopNum;
-		if (!defected)
-			std::cout << " completed successfully\n";
-		else
-			std::cout << " could not be written without defects in the given number of attempts\n";
+		if (verbose)
+		{
+			std::cout << "File " << mainLoopNum;
+			if (!defected)
+				std::cout << " completed successfully\n";
+			else
+				std::cout << " could not be written without defects in the given number of attempts\n";
+		}
 		//Write generation information to csv----------------------------------------------------------------------------------------------
-		codeData << (writeLoc + std::to_string(mainLoopNum)).c_str() << "," << defected << "," << thisAttemptNum + 1 << "," << aSwitches << "," << bSwitches << "\n";
+		if (csv)
+			codeData << (writeLoc + std::to_string(mainLoopNum)).c_str() << "," << defected << "," << thisAttemptNum + 1 << "," << aSwitches << "," << bSwitches << "\n";
 	}
 
-	codeData.close();
+	if (csv)
+		codeData.close();
 	return 0;
 }
